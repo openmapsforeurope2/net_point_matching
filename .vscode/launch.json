@@ -8,7 +8,7 @@
         "request": "launch",
         "program": "/usr/local/src/net_point_matching/bin/net_point_matchingd",
         "cwd": "/usr/local/src/net_point_matching",
-        "args": ["--c", "/usr/local/src/net_point_matching/config/epg_parameters.ini", "--cc", "at#ch", "--sp", "520"],
+        "args": ["--c", "/usr/local/src/net_point_matching/config/epg_parameters.ini", "--t", "hydro_node", "--cc", "ch#fr", "--sp", "510-520"],
         "stopAtEntry": true,
         "environment": [{ "name": "config", "value": "Debug" }],
         "externalConsole": true,

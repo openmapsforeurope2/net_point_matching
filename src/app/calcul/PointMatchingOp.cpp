@@ -145,6 +145,14 @@ namespace app
                     ign::geometry::Point const& pointGeom = fPoint.getGeometry().asPoint();
                     std::string pointId = fPoint.getId();
 
+                    //DEBUG
+                    // if( pointId == "888eec32-f6d4-4b49-b724-58e8c8fa8447") {
+                    //     bool test = true;
+                    // }
+                    // if( pointId == "02764c12-a755-47c3-9ee9-a36a201c6b65") {
+                    //     bool test = true;
+                    // }
+
                     std::map<std::string, std::list<std::string>>::const_iterator mitAdj = mAdjacency.find(pointId);
                     if (mitAdj == mAdjacency.end())
                         continue;
@@ -163,6 +171,12 @@ namespace app
                         std::vector< edge_descriptor > vIncidentEdges = graph.incidentEdges(mit->second);
                         std::list<std::string> lNewAdjacentEdges;
                         for ( size_t i = 0 ; i < vIncidentEdges.size() ; ++i ) {
+                            //patch (erreur reprise manuelle)
+                            if ( graph.source(vIncidentEdges[i]) == graph.target(vIncidentEdges[i]) ) {
+                                if( graph.getGeometry(vIncidentEdges[i]).length() < 0.01 )
+                                    continue;
+                            }
+
                             lNewAdjacentEdges.push_back(vEdgeIndexNatId[ign::data::String(graph.origins(vIncidentEdges[i]).front()).toInteger()]);
                         }
 
@@ -261,7 +275,7 @@ namespace app
 
             // chargement des edges
             ign::feature::FeatureFilter filterEdge( countryCodeName +" LIKE '%"+country+"%'" );
-            //patch
+            //patch (erreur reprise manuelle)
             epg::tools::FilterTools::addAndConditions(filterEdge, epgParams.getValue(GEOM).toString() + " IS NOT NULL");
 
             ign::geometry::graph::builder::SimpleGraphBuilder<GraphType> builder(graph, 1e-5);
@@ -293,6 +307,12 @@ namespace app
                         fNatId = vNatId[index];
                     }
                 }
+                // if( ls.startPoint().distance(ign::geometry::Point(4128248.689,2710497.596)) < 0.5 ) {
+                //     bool test = true;
+                // }
+                // if( ls.endPoint().distance(ign::geometry::Point(4128248.689,2710497.596)) < 0.5 ) {
+                //     bool test = true;
+                // }
 
                 builder.addEdge(ign::geometry::LineString(ls.startPoint(), ls.endPoint()), ign::data::Integer(vEdgeIndexNatId.size()).toString());
                 vEdgeIndexNatId.push_back(fNatId);

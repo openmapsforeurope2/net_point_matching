@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 	std::string     themeParametersFile = "";
 	std::string     stepCode = "";
 	std::string     countryCode = "";
+    std::string     table = "";
 	bool            verbose = true;
     
 	epg::step::StepSuite< app::params::ThemeParametersS > stepSuite;
@@ -43,6 +44,7 @@ int main(int argc, char *argv[])
         ("help", "produce help message")
         ("c" , po::value< std::string >(&epgParametersFile)     , "conf file" )
         ("cc" , po::value< std::string >(&countryCode)          , "country code" )
+        ("t" , po::value< std::string >(&table)                 , "table" )
 		("sp", po::value< std::string >(&stepCode), OperatorDetail.str().c_str())
     ;
     stepCode = stepSuite.getStepsRange();
@@ -67,7 +69,7 @@ int main(int argc, char *argv[])
         }
    
         //parametres EPG
-		context->loadEpgParameters( epgParametersFile );
+		context->loadEpgParameters( epgParametersFile, table );
 
         //Initialisation du log de prod
         logDirectory = context->getConfigParameters().getValue( LOG_DIRECTORY ).toString();
@@ -102,10 +104,6 @@ int main(int argc, char *argv[])
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
         // logger->setProdOfstream( logDirectory+"/au_merging.log" );
         logger->setDevOfstream( context->getLogDirectory()+"/net_point_matching.log" );
-
-        //shape logger
-        epg::log::ShapeLogger* shapeLogger = epg::log::ShapeLoggerS::getInstance();
-	    shapeLogger->setDataDirectory( context->getLogDirectory()+"/shape" );
 
         //set BDD search path
         context->getDataBaseManager().setSearchPath(themeParameters->getValue(WORKING_SCHEMA).toString());

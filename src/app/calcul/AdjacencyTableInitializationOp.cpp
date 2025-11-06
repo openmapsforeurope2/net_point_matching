@@ -165,6 +165,14 @@ namespace app
                     ign::geometry::Point const& pointGeom = fPoint.getGeometry().asPoint();
                     std::string pointId = fPoint.getId();
 
+                    //DEBUG
+                    // if( pointId == "888eec32-f6d4-4b49-b724-58e8c8fa8447") {
+                    //     bool test = true;
+                    // }
+                    // if( pointId == "02764c12-a755-47c3-9ee9-a36a201c6b65") {
+                    //     bool test = true;
+                    // }
+
                     std::set< size_t > sIndex;
                     qtree.query( pointGeom.getEnvelope().expandBy( maxAssDist ), sIndex );
 

@@ -18,8 +18,11 @@ namespace params{
 		_initParameter( DB_CONF_FILE, "DB_CONF_FILE");
 		_initParameter( WORKING_SCHEMA, "WORKING_SCHEMA");
 		_initParameter( POINT_TABLE, "POINT_TABLE");
+		_initParameter( POINT_TABLE_BASE, "POINT_TABLE_BASE");
 		_initParameter( NET_TABLE_INIT, "NET_TABLE_INIT");
+		_initParameter( NET_TABLE_INIT_BASE, "NET_TABLE_INIT_BASE");
 		_initParameter( NET_TABLE_MATCHED, "NET_TABLE_MATCHED");
+		_initParameter( NET_TABLE_MATCHED_BASE, "NET_TABLE_MATCHED_BASE");
 		_initParameter( COUNTRY_CODE_W, "COUNTRY_CODE_W");
 		_initParameter( LANDMASK_TABLE, "LANDMASK_TABLE" );
 		_initParameter( LAND_COVER_TYPE_NAME, "LAND_COVER_TYPE_NAME" );

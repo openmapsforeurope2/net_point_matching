@@ -45,17 +45,20 @@ L'outil s'utilise en ligne de commande.
 
 Paramètres:
 * c [obligatoire] : chemin vers le fichier de configuration
-* cc [obligatoire] : code frontière (exemple : be#fr)
+* s [obligatoire] : suffix de la table de travail
+* ns [obligatoire] : suffix des tables de travail du réseau
+* t [obligatoire] : nom de la classe d'objet (hydro_node ou road_node)
 * sp [obligatoire] : étape(s) à executer (exemples: 510 ; 510,520 ; 510-520)
+* arguments libres [obligatoire] : codes des deux pays frontaliers
 
 <br>
 
 Exemple d'appel pour lancer successivement l'ensemble des étapes sur la frontière franco-belge :
 ~~~
-bin/net_point_matching --c path/to/config/epg_parameters.ini --cc be#fr
+bin/net_point_matching --c path/to/config/epg_parameters.ini --t hydro_node --s 20251113 --ns 20251111 fr be
 ~~~
 
 Exemple d'appel pour ne lancer qu'une seule étape :
 ~~~
-bin/net_point_matching --c path/to/config/epg_parameters.ini --cc be#fr --sp 510
+bin/net_point_matching --c path/to/config/epg_parameters.ini --t hydro_node --s 20251113 --ns 20251111 --sp 510 fr be
 ~~~

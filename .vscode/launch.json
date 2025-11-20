@@ -8,9 +8,11 @@
         "request": "launch",
         "program": "/usr/local/src/net_point_matching/bin/net_point_matchingd",
         "cwd": "/usr/local/src/net_point_matching",
-        "args": ["--c", "/usr/local/src/net_point_matching/config/epg_parameters.ini", "--t", "hydro_node", "--cc", "ch#fr", "--sp", "510-520"],
+        "args": ["--c", "/usr/local/src/net_point_matching/config/epg_parameters.ini", "--t", "hydro_node", "--s", "20251117", "--ns", "20251111", "--sp", "510-520", "ch", "fr"],
         "stopAtEntry": true,
-        "environment": [{ "name": "config", "value": "Debug" }],
+        "environment": [
+            { "name": "config", "value": "Debug" }
+        ],
         "externalConsole": true,
         "sourceFileMap": {
             "/usr/local/src/net_point_matching/src":"${workspaceRoot}/src",
@@ -23,7 +25,7 @@
         "pipeTransport": {
             "debuggerPath": "/usr/bin/gdb",
             "pipeProgram": "docker",
-            "pipeArgs": ["exec", "-i", "net_point_matching_container", "sh", "-c"],
+            "pipeArgs": ["exec", "-i", "net_point_matching_base_container", "sh", "-c"],
             "pipeCwd": "${workspaceRoot}"
         },
         "MIMode": "gdb",

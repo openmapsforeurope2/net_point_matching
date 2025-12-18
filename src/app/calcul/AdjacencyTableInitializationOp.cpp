@@ -141,7 +141,7 @@ namespace app
                 {
                     ++displayCountry;
 
-                    ign::feature::Feature const& fEdge = itEdge->next();
+                    ign::feature::Feature fEdge = itEdge->next();
                     ign::geometry::LineString const& edgeGeom = fEdge.getGeometry().asLineString();
                     std::string const& natId = fEdge.getAttribute(natIdIdName).toString();
 
@@ -161,7 +161,7 @@ namespace app
                 {
                     ++display;
 
-                    ign::feature::Feature const& fPoint = itPoint->next();
+                    ign::feature::Feature fPoint = itPoint->next();
                     ign::geometry::Point const& pointGeom = fPoint.getGeometry().asPoint();
                     std::string pointId = fPoint.getId();
 

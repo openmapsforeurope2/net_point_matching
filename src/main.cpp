@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
 		//theme parameters
 		themeParametersFile = context->getConfigParameters().getValue(THEME_PARAMETER_FILE).toString();
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-        epg::params::tools::loadParams(*themeParameters, themeParametersFile, borderCode);
+        epg::params::tools::loadParams(*themeParameters, themeParametersFile, borderCoconst& de);
         if (themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString() == "")
             IGN_THROW_EXCEPTION("country code " + borderCode + " unknown in theme parameter file");
         if ( themeParameters->getValue(ADJACENCY_TABLE).toString() == "" ) 
@@ -120,15 +120,15 @@ int main(int argc, char *argv[])
         context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
         //pour IGN-MUT
         if( context->getConfigParameters().parameterHasNullValue(HOST) ) 
-            context->getConfigParameters().setParameter(HOST, ign::data::String(ome2::utils::getEnvStr("HOST")));
+            context->getConfigParameters().setParameter(HOST, ign::data::String(ome2::utils::getEnvStr("PGHOST")));
         if( context->getConfigParameters().parameterHasNullValue(PORT) ) 
-            context->getConfigParameters().setParameter(PORT, ign::data::String(ome2::utils::getEnvStr("PORT")));
+            context->getConfigParameters().setParameter(PORT, ign::data::String(ome2::utils::getEnvStr("PGPORT")));
         if( context->getConfigParameters().parameterHasNullValue(USER) ) 
-            context->getConfigParameters().setParameter(USER, ign::data::String(ome2::utils::getEnvStr("USER")));
+            context->getConfigParameters().setParameter(USER, ign::data::String(ome2::utils::getEnvStr("PGUSER")));
         if( context->getConfigParameters().parameterHasNullValue(PASSWORD) ) 
-            context->getConfigParameters().setParameter(PASSWORD, ign::data::String(ome2::utils::getEnvStr("PASSWORD")));
+            context->getConfigParameters().setParameter(PASSWORD, ign::data::String(ome2::utils::getEnvStr("PGPASSWORD")));
         if( context->getConfigParameters().parameterHasNullValue(DATABASE) ) 
-            context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("DATABASE")));
+            context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("PGDATABASE")));
 
         //epg logger
         epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();

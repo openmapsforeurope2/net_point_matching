@@ -8,7 +8,7 @@
         "request": "launch",
         "program": "/usr/local/src/net_point_matching/bin/net_point_matchingd",
         "cwd": "/usr/local/src/net_point_matching",
-        "args": ["--c", "/usr/local/src/net_point_matching/config/epg_parameters.ini", "--t", "hydro_node", "--s", "20251117", "--ns", "20251111", "--sp", "510-520", "ch", "fr"],
+        "args": ["--c", "/usr/local/src/net_point_matching/config/epg_parameters.ini", "--t", "hydro_node", "--s", "20251203", "--ns", "20250213", "--sp", "510-520", "be", "fr"],
         "stopAtEntry": true,
         "environment": [
             { "name": "config", "value": "Debug" }
@@ -25,14 +25,16 @@
         "pipeTransport": {
             "debuggerPath": "/usr/bin/gdb",
             "pipeProgram": "docker",
-            "pipeArgs": ["exec", "-i", "net_point_matching_base_container", "sh", "-c"],
+            "pipeArgs": ["exec", "-i", "net_point_matching_dev_container", "sh", "-c"],
             "pipeCwd": "${workspaceRoot}"
         },
         "MIMode": "gdb",
-        "setupCommands": [{
-            "description": "Enable pretty-printing for gdb",
-            "text": "-enable-pretty-printing",
-            "ignoreFailures": true
-        }]
+        "setupCommands": [
+            {
+                "description": "Enable pretty-printing for gdb",
+                "text": "-enable-pretty-printing",
+                "ignoreFailures": true
+            }
+        ]
     }, ]
 }

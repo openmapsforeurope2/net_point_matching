@@ -125,6 +125,15 @@ namespace app
             
             for ( std::vector<std::string>::const_iterator vit = vCountry.begin() ; vit != vCountry.end() ; ++vit ) {
 
+                //--
+                ign::feature::FeatureFilter filterPoint( countryCodeName +"='"+*vit+"'" );
+                int numPoints = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsPoint, filterPoint);
+                if ( numPoints == 0 ) {
+                    std::cout << "[ empty point table for country '" << *vit << "' ] skipped" << std::endl;
+                    continue;
+                }
+                
+                //--
                 ign::geometry::index::QuadTree<size_t> qtree;
                 std::vector<std::pair<std::string, ign::geometry::MultiPoint>> vIdEndings;
 
@@ -145,15 +154,14 @@ namespace app
                     ign::geometry::LineString const& edgeGeom = fEdge.getGeometry().asLineString();
                     std::string const& natId = fEdge.getAttribute(natIdIdName).toString();
 
-                    qtree.insert(vIdEndings.size(), edgeGeom.getEnvelope());
-                    vIdEndings.push_back(std::make_pair(natId, ign::geometry::MultiPoint(edgeGeom.startPoint())));
-                    vIdEndings.back().second.addGeometry(edgeGeom.endPoint());
+                    ign::geometry::MultiPoint mlpEndings(edgeGeom.startPoint());
+                    mlpEndings.addGeometry(edgeGeom.endPoint());
+
+                    qtree.insert(vIdEndings.size(), mlpEndings.getEnvelope());
+                    vIdEndings.push_back(std::make_pair(natId, mlpEndings));
                 }
 
                 //--
-                ign::feature::FeatureFilter filterPoint( countryCodeName +"='"+*vit+"'" );
-
-                int numPoints = ome2::feature::sql::NotDestroyedTools::NumFeatures(*_fsPoint, filterPoint);
                 boost::progress_display display(numPoints, std::cout, "[ computing adjacency ["+*vit+"] % complete ]\n");
 
                 ign::feature::FeatureIteratorPtr itPoint = ome2::feature::sql::NotDestroyedTools::GetFeatures(*_fsPoint, filterPoint);
@@ -164,14 +172,6 @@ namespace app
                     ign::feature::Feature fPoint = itPoint->next();
                     ign::geometry::Point const& pointGeom = fPoint.getGeometry().asPoint();
                     std::string pointId = fPoint.getId();
-
-                    //DEBUG
-                    // if( pointId == "888eec32-f6d4-4b49-b724-58e8c8fa8447") {
-                    //     bool test = true;
-                    // }
-                    // if( pointId == "02764c12-a755-47c3-9ee9-a36a201c6b65") {
-                    //     bool test = true;
-                    // }
 
                     std::set< size_t > sIndex;
                     qtree.query( pointGeom.getEnvelope().expandBy( maxAssDist ), sIndex );

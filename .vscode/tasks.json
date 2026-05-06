@@ -2,33 +2,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build package",
-            "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_base ./build-unix-package.sh",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": [
-                    "relative",
-                    "${workspaceFolder}"
-                ],
-                "pattern": {
-                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                    "file": 1,
-                    "line": 2,
-                    "column": 3,
-                    "severity": 4,
-                    "message": 5
-                }
-            }
-        },
-        {
             "label": "build release",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_base ./build-unix-release.sh",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_dev sh -c 'CONFIG=Release ./build-unix.sh'",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -52,7 +28,7 @@
         {
             "label": "build debug",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_base ./build-unix-debug.sh",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_dev sh -c 'CONFIG=Debug ./build-unix.sh'",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -82,14 +58,14 @@
         {
             "label": "run the code",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_base ./bin/net_point_matching --c /usr/local/src/net_point_matching/config/epg_parameters.ini --t hydro_node --s 20251117 --ns 20251111 be fr",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_dev ./bin/net_point_matching --c /usr/local/src/net_point_matching/config/epg_parameters.ini --t hydro_node --s 20251203 --ns 20250213 be fr",
             "group": "build",
             "problemMatcher": []
         },
         {
             "label": "prepare to debug",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching --name net_point_matching_base_container -it net_point_matching_base ",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching --name net_point_matching_dev_container -it net_point_matching_dev",
             "group": "build",
             "problemMatcher": []
         }

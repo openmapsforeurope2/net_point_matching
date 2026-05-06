@@ -11,7 +11,6 @@
 
 //OME2
 #include <ome2/utils/setTableName.h>
-#include <ome2/utils/getEnvStr.h>
 
 //APP
 #include <app/params/ThemeParameters.h>
@@ -21,10 +20,10 @@
 
 namespace po = boost::program_options;
 
-
 int main(int argc, char *argv[])
 {
     epg::Context* context = epg::ContextS::getInstance();
+
 	std::string     logDirectory = "";
 	std::string     epgParametersFile = "";
 	std::string     themeParametersFile = "";
@@ -99,7 +98,7 @@ int main(int argc, char *argv[])
         {
             if (!boost::filesystem::create_directory(logDir))
             {
-                std::string mError = "the directory " + logDirectory + " cannot be created";
+                std::string mError = "impossible to create directory " + logDirectory;
                 IGN_THROW_EXCEPTION(mError);
             }
         }
@@ -107,10 +106,15 @@ int main(int argc, char *argv[])
         //repertoire de travail
         context->setLogDirectory( logDirectory );
 
+        //epg logger
+        epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
+        // logger->setProdOfstream( logDirectory+"/net_point_matching.log" );
+        logger->setDevOfstream( context->getLogDirectory()+"/net_point_matching.log" );
+
 		//theme parameters
 		themeParametersFile = context->getConfigParameters().getValue(THEME_PARAMETER_FILE).toString();
 		app::params::ThemeParameters* themeParameters = app::params::ThemeParametersS::getInstance();
-        epg::params::tools::loadParams(*themeParameters, themeParametersFile, borderCoconst& de);
+        epg::params::tools::loadParams(*themeParameters, themeParametersFile, borderCode);
         if (themeParameters->getParameter(COUNTRY_CODE_W).getValue().toString() == "")
             IGN_THROW_EXCEPTION("country code " + borderCode + " unknown in theme parameter file");
         if ( themeParameters->getValue(ADJACENCY_TABLE).toString() == "" ) 
@@ -118,22 +122,6 @@ int main(int argc, char *argv[])
 
         //info de connection db
         context->loadEpgParameters( themeParameters->getValue(DB_CONF_FILE).toString() );
-        //pour IGN-MUT
-        if( context->getConfigParameters().parameterHasNullValue(HOST) ) 
-            context->getConfigParameters().setParameter(HOST, ign::data::String(ome2::utils::getEnvStr("PGHOST")));
-        if( context->getConfigParameters().parameterHasNullValue(PORT) ) 
-            context->getConfigParameters().setParameter(PORT, ign::data::String(ome2::utils::getEnvStr("PGPORT")));
-        if( context->getConfigParameters().parameterHasNullValue(USER) ) 
-            context->getConfigParameters().setParameter(USER, ign::data::String(ome2::utils::getEnvStr("PGUSER")));
-        if( context->getConfigParameters().parameterHasNullValue(PASSWORD) ) 
-            context->getConfigParameters().setParameter(PASSWORD, ign::data::String(ome2::utils::getEnvStr("PGPASSWORD")));
-        if( context->getConfigParameters().parameterHasNullValue(DATABASE) ) 
-            context->getConfigParameters().setParameter(DATABASE, ign::data::String(ome2::utils::getEnvStr("PGDATABASE")));
-
-        //epg logger
-        epg::log::EpgLogger* logger = epg::log::EpgLoggerS::getInstance();
-        // logger->setProdOfstream( logDirectory+"/au_merging.log" );
-        logger->setDevOfstream( context->getLogDirectory()+"/net_point_matching.log" );
         
         //tables de réseau
         if ( !netSuffix.empty() ) {
@@ -155,22 +143,20 @@ int main(int argc, char *argv[])
 
         //set BDD search path
         context->getDataBaseManager().setSearchPath(themeParameters->getValue(WORKING_SCHEMA).toString());
-        ome2::utils::setTableName<app::params::ThemeParametersS>(LANDMASK_TABLE);
-        ome2::utils::setTableName<epg::params::EpgParametersS>(TARGET_BOUNDARY_TABLE);
 
         //créer la table d'adjacence
         app::utils::createAdjacencyTable();
         
-		logger->log(epg::log::INFO, "[START HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
+		logger->log(epg::log::INFO, "[START NET POINT MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
         
         //lancement du traitement
 		stepSuite.run(stepCode, verbose);
 
-		logger->log(epg::log::INFO, "[END HY MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
+		logger->log(epg::log::INFO, "[END NET POINT MATCHING PROCESS ] " + epg::tools::TimeTools::getTime());
     }
     catch( ign::Exception &e )
     {
-        std::cerr<< e.diagnostic() << std::endl;
+        std::cerr << e.diagnostic() << std::endl;
         epg::log::EpgLoggerS::getInstance()->log( epg::log::ERROR, std::string(e.diagnostic()));
         logFile << e.diagnostic() << std::endl;
         returnValue = 1;
@@ -184,9 +170,11 @@ int main(int argc, char *argv[])
     }
     
     logFile << "[END] " << epg::tools::TimeTools::getTime() << std::endl;
+    
     epg::ContextS::kill();
     epg::log::EpgLoggerS::kill();
     epg::log::ShapeLoggerS::kill();
+    epg::params::EpgParametersS::kill();
     app::params::ThemeParametersS::kill();
 
     logFile.close();

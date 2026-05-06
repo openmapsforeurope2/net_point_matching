@@ -24,10 +24,6 @@ namespace params{
 		_initParameter( NET_TABLE_MATCHED, "NET_TABLE_MATCHED");
 		_initParameter( NET_TABLE_MATCHED_BASE, "NET_TABLE_MATCHED_BASE");
 		_initParameter( COUNTRY_CODE_W, "COUNTRY_CODE_W");
-		_initParameter( LANDMASK_TABLE, "LANDMASK_TABLE" );
-		_initParameter( LAND_COVER_TYPE_NAME, "LAND_COVER_TYPE_NAME" );
-		_initParameter( TYPE_LAND_AREA, "TYPE_LAND_AREA");
-		_initParameter( TYPE_INLAND_WATER, "TYPE_INLAND_WATER" );
 		_initParameter( NATIONAL_IDENTIFIER_NAME, "NATIONAL_IDENTIFIER_NAME");
 		_initParameter( W_TAG_NAME, "W_TAG_NAME");
 

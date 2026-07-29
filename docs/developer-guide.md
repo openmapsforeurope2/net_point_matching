@@ -26,7 +26,7 @@ Le code source du socle ce trouve sur le dépôt [sd-socle](http://gitlab.forge-
 ### LibEPG 
 
 Cette bibliothèque, développée à l'IGN et s'appuyant essentiellement sur le socle logiciel, contient de nombreux algorithmes et fonctions utilitaires dédiés spécifiquement aux besoins des produits européens (EGM/ERM) ainsi qu'au projet [OME2](https://github.com/openmapsforeurope2/OME2).
-Elle comporte essentiellement des fonctions de généralisations, des fonctions utiles au management du processus tels que des utilitaires de log, d'orchestration, de gestion du contexte).
+Elle comporte essentiellement des fonctions de généralisations, des fonctions utiles au management du processus tels que des utilitaires de log, d'orchestration, de gestion du contexte.
 On y trouve également des opérateurs permettant d'encapsuler des objets géométriques complexes afin d'en optimiser la manipulation (par l'utilisation de graphes, d'indexes...) et ainsi d'accroitre les performances globales des processus.
 
 Le code source de la bibliothèque libepg ce trouve sur le dépôt [libepg](https://github.com/IGNF/libepg.git)
@@ -63,7 +63,7 @@ L'outil **epg::step::StepSuite** donne la possibilité de ne lancer que certaine
 
 L'outil s'appuie sur de nombreux paramètres de configuration permettant d'adapter le comportement des algorithmes en fonctions des spécificités nationales (sémantique, précision, échelle, conventions de modélisation...).
 
-On trouve dans le [dossier de configuration](https://github.com/openmapsforeurope2/area_matching/tree/main/config) les fichiers suivants :
+On trouve dans le [dossier de configuration](https://github.com/openmapsforeurope2/net_point_matching/tree/main/config) les fichiers suivants :
 
 - epg_parameters.ini : regroupe des paramètres de base issus de la bibliothèque libepg qui constitue le socle de développement l'outil. Ce fichier est aussi le fichier chapeau qui pointe vers les autres fichiers de configurations.
 - db_conf.ini : informations de connexion à la base de données.
@@ -121,24 +121,26 @@ L'objectif de cette étape est de créer une table d'adjacence permettant d'éta
 
 #### Description du traitement :
 Paramètre utilisés: 
-| paramètre                       | description                                                                                      |
-|---------------------------------|--------------------------------------------------------------------------------------------------|
-| AI_MAX_ASSOCIATION_DIST         | distance maximum entre un objet ponctuel et les extrémités d'un arc pour établir une association |
+| paramètre                  | description                                                                                      |
+|----------------------------|--------------------------------------------------------------------------------------------------|
+| AI_MAX_ASSOCIATION_DIST    | distance maximum entre un objet ponctuel et les extrémités d'un arc pour établir une association |
+| NATIONAL_IDENTIFIER_NAME   | nom du champ utilisé comme identifiant des arcs                                                  |
 
 Le traitement décrit ci-après et répété pour chacun des deux pays frontaliers.
 On parcourt l'ensemble des arcs (avant raccordement aux frontières) du pays. Pour chaque arc, on récupère la géométrie de ses extremités sous forme d'un multi-point ainsi que son identifiant. Ce 'tuple' est enregistré et indexé spatialement.
-On parcourt ensuite les objets ponctuels appartenant au pays traité. Pour chacun d'eux on récupère, grâce à l'index spatial construit précedemment, les tuples des arcs à proximité. Pour chaque tuple dont le multipoint est situé à une distance inférieur à _AI_MAX_ASSOCIATION_DIST_ de l'objet ponctuel, on enregistre une association {identifiant de l'objet pontuel, identifiant de l'arc}.
+On parcourt ensuite les objets ponctuels appartenant au pays traité. Pour chacun d'eux on récupère, grâce à l'index spatial construit précedemment, les tuples des arcs à proximité. Pour chaque tuple dont le multipoint est situé à une distance inférieur à _AI_MAX_ASSOCIATION_DIST_ de l'objet ponctuel, on enregistre une association {identifiant de l'objet pontuel, identifiant de l'arc}. L'identification des arcs est réalisée grâce au champs _NATIONAL_IDENTIFIER_NAME_ car l'identifiant unique servant de clé primaire pour la table des arcs peut être modifié au cours du processus de raccordement aux frontières.
 
-Une fois collectées l'ensemble des associations possibles pour les deux pays on les enregistre de manière persistante dans la table d'adjacence.
+Une fois collectées l'ensemble des associations possibles pour les deux pays on les enregistre de manière persistante dans la table d'adjacence (cette table possède deux champs : _POINT_ID_NAME_ et _EDGE_ID_NAME_).
 
+![510_with_key](images/510_with_key.png)
 
 ### 520 : PointMatching
 
-La première étape ayant permis de décrire topologiquement (par relation d'incidence) les noeuds du réseau auquel sont liés les objets ponctuels, cette seconde étape a pour objectif d'identifier ce même noeud dans le réseau modifié par le processus de raccordement (qui peut engendrer des déplacements ou suppression d'arcs).
+La première étape ayant permis de décrire topologiquement (par relation d'incidence) les noeuds du réseau auquels sont liés les objets ponctuels, cette seconde étape a pour objectif d'identifier ce même noeud dans le réseau modifié par le processus de raccordement (qui peut engendrer des déplacements ou suppression d'arcs).
 
 #### Données de travail :
 
-| table                          | entrée | sortie | entitée de travail | description                                                    |
+| table                          | entrée | sortie | entitée de travail | description                                                                   |
 |--------------------------------|--------|--------|--------------------|-------------------------------------------------------------------------------|
 | POINT_TABLE                    | X      | X      | X                  | table des objet ponctuels traitée                                             |
 | NET_TABLE_MATCHED              | X      |        |                    | table du réseau associé résultant du processus de raccordement aux frontières |
@@ -149,20 +151,23 @@ La première étape ayant permis de décrire topologiquement (par relation d'inc
 
 #### Description du traitement :
 Paramètre utilisés: 
-| paramètre                       | description                                                                                                                 |
-|---------------------------------|-----------------------------------------------------------------------------------------------------------------------------|
-| PM_MAX_MATCHING_DIST            | distance maximum d'un noeud du réseau raccordé à un objet ponctuel pour qu'il soit selectionné comme candidat à l'appairage |
+| paramètre                  | description                                                                                                                 |
+|----------------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| PM_MAX_MATCHING_DIST       | distance maximum d'un noeud du réseau raccordé à un objet ponctuel pour qu'il soit selectionné comme candidat à l'appairage |
+| NATIONAL_IDENTIFIER_NAME   | nom du champ utilisé comme identifiant des arcs                                                  |
 
 
 Dans un premier temps on charge en mémoire la table d'adjacence, à chaque objet ponctuel, pour lequel un ou plusieurs liens ont pu être établis avec les arcs du réseau, on associe la liste de ses arcs adjacents (les arcs ne possédant aucun lien avec le réseau n'ont pas été enregistrés dans la table d'adjacence).
 
 On répète ensuite le traitement qui suit pour chacun des deux pays frontaliers.
-On charge un graphe géométrique simplifié avec le réseau du pays, chaque arc étant représenté par segment un défini par ses deux extrémités.
-Ensuite on parcourt l'ensemble des objets ponctuels. Pour chaque objet présent dans la liste d'adjacence on récupère les noeuds du graphe situés à une distance inférieure à _PM_MAX_MATCHING_DIST_ ainsi que la liste des arcs adjacents _L1_ (avant raccordement). Tous ces noeuds sont candidats à l'association avec l'objet ponctuel. Il nous faut maintenant selectionner celui qui représente l'association la plus pertinente. Pour cela on parcourt les noeuds candidats et pour chacun on récupère la liste des arcs incidents _L2_ (après raccordement). Si le nombre d'items de _L2_ est supérieur à celui _L1_, on élimine le candidat (le raccordement au frontières ne peut pas avoir créé de nouvelles connexions au sein d'un même pays), sinon on calcule le nombre d'items communs entre _L1_ et _L2_ et on calcul le score affecté au candidat comme suit :
+On charge un graphe géométrique simplifié avec le réseau du pays raccordé aux frontières, chaque arc étant représenté par segment un défini par ses deux extrémités.
+Ensuite on parcourt l'ensemble des objets ponctuels. Pour chaque objet présent dans la liste d'adjacence on récupère les noeuds du graphe situés à une distance inférieure à _PM_MAX_MATCHING_DIST_ ainsi que la liste des arcs adjacents _L1_ (avant raccordement). Tous ces noeuds sont candidats à l'association avec l'objet ponctuel. Il nous faut maintenant selectionner celui qui représente l'association la plus pertinente. Pour cela on parcourt les noeuds candidats et pour chacun on récupère la liste des arcs incidents _L2_ (après raccordement). Si le nombre d'items de _L2_ est supérieur à celui _L1_, on élimine le candidat (le raccordement aux frontières ne peut pas avoir créé de nouvelles connexions au sein d'un même pays), sinon on calcule le nombre d'items communs entre _L1_ et _L2_ et on calcul le score affecté au candidat comme suit :
 _score_ = _D_ * ( _N1_ / _N_ )     
   avec : 
   - _D_ : distance entre l'objet ponctuel et le candidat
   - _N1_ : nombre d'items de _L1_
   - _N_ : nombre d'items communs entre _L1_ et _L2_
 
-Si aucun candidat n'est éligible à l'association, l'objet ponctuel est supprimé (l'objet possédait initialement une connexion au réseau qui a disparu à l'issu du processus de raccordement). Sinon on déplace l'objet ponctuel vers meilleur candidat si la distance qui les sépare n'est pas nulle.
+Si aucun candidat n'est éligible à l'association, l'objet ponctuel est supprimé (l'objet possédait initialement une connexion au réseau qui a disparu à l'issu du processus de raccordement). Sinon on déplace l'objet ponctuel vers le meilleur candidat (celui qui a le plus petit score) si la distance qui les sépare n'est pas nulle.
+
+![520_with_key](images/520_with_key.png)

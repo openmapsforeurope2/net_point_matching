@@ -130,18 +130,18 @@ int main(int argc, char *argv[])
         //tables de réseau
         if ( !netSuffix.empty() ) {
             std::string initNetTableBaseName = themeParameters->getValue(NET_TABLE_INIT_BASE).toString();
-            std::string initNetTableName = initNetTableBaseName + "_" + countries.front() + "_" + countries.back() + "_" + netSuffix;
+            std::string initNetTableName = initNetTableBaseName + "_" + netSuffix;
             themeParameters->setParameter(NET_TABLE_INIT, ign::data::String(initNetTableName));
 
             std::string matchedNetTableBaseName = themeParameters->getValue(NET_TABLE_MATCHED_BASE).toString();
-            std::string matchedNetTableName = matchedNetTableBaseName + "_" + countries.front() + "_" + countries.back() + "_" + netSuffix;
+            std::string matchedNetTableName = matchedNetTableBaseName + "_" + netSuffix;
             themeParameters->setParameter(NET_TABLE_MATCHED, ign::data::String(matchedNetTableName));
         }
         
         //table de travail
         if ( !suffix.empty() ) {
             std::string tableBaseName = themeParameters->getValue(POINT_TABLE_BASE).toString();
-            std::string tableName = tableBaseName + "_" + countries.front() + "_" + countries.back() + "_" + suffix;
+            std::string tableName = tableBaseName + "_" + suffix;
             themeParameters->setParameter(POINT_TABLE, ign::data::String(tableName));
         }
 

@@ -58,7 +58,7 @@
         {
             "label": "run the code",
             "type": "shell",
-            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_dev ./bin/net_point_matching --c /usr/local/src/net_point_matching/config/epg_parameters.ini --t hydro_node --s 20251203 --ns 20250213 be fr",
+            "command": "docker run --privileged -v ${workspaceFolder}:/usr/local/src/net_point_matching net_point_matching_dev ./bin/net_point_matching --c /usr/local/src/net_point_matching/config/epg_parameters.ini --t hydro_node --s 20251203 --ns 20250213 be lu",
             "group": "build",
             "problemMatcher": []
         },
